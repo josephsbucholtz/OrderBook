@@ -3,7 +3,7 @@
 #include <queue>
 #include <unordered_map>
 
-#include <stdint.h> 
+#include "utils.hpp"
 
 enum class OrderType {
     MARKET,
@@ -18,7 +18,7 @@ enum class Side {
 
 class Order {
 public:
-    Order(int orderId, OrderType orderType, Side side, uint32_t quantity, int price) {
+    Order(OrderId orderId, OrderType orderType, Side side, Quantity quantity, Price price) {
         m_orderId = { orderId };
         m_orderType = { orderType };
         m_side = { side };
@@ -33,14 +33,14 @@ public:
     bool operator>(const Order& other) const {
         return this->m_price > other.m_price;
     }
-    int getOrderId() { return m_orderId; }
+    OrderId getOrderId() { return m_orderId; }
     OrderType getOrderType() { return m_orderType; }
     Side getSide() { return m_side; }
-    uint32_t getQuantity() { return m_quantity; }
-    int getPrice() { return m_price; }
+    Quantity getQuantity() { return m_quantity; }
+    Price getPrice() { return m_price; }
     bool isFilled() { return m_quantity == 0; }
 
-    void fill(uint32_t quantity) {
+    void fill(Quantity quantity) {
         if (quantity > getQuantity()) {
             std::cout << "Order cannot be filled\n";
             return; 
@@ -51,11 +51,11 @@ public:
     
 
 private:
-    int  m_orderId; 
+    OrderId  m_orderId; 
     OrderType m_orderType;
     Side m_side;
-    uint32_t m_quantity;
-    int m_price;
+    Quantity m_quantity;
+    Price m_price;
     
 
 };
@@ -77,8 +77,8 @@ public:
         }
     }
 
-    void removeOrder(int orderId);
-    void modifyOrder(int orderId);
+    void removeOrder(OrderId orderId);
+    void modifyOrder(OrderId orderId);
 
     std::priority_queue<Order> getBids() { return m_bids;}
 
@@ -97,13 +97,13 @@ public:
     m_name { name } 
     {}
 
-    Client(std::string name, int balance) : 
+    Client(std::string name, Balance balance) : 
     m_name { name } , 
     m_balance { balance }
     {}
 
     std::string getName() { return m_name; }; 
-    int getBalance() { return m_balance; };
+    Balance getBalance() { return m_balance; };
 
     void placeOrder(int amount);
     void cancelOrder(const std::vector<Order>& orders);
@@ -111,7 +111,7 @@ public:
 
 private:
     std::string m_name;
-    int m_balance {}; 
+    Balance m_balance {}; 
     std::vector<Order> m_orders {};
 };
 
