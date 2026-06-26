@@ -105,7 +105,16 @@ public:
     std::string getName() { return m_name; }; 
     Balance getBalance() { return m_balance; };
 
-    void placeOrder(int amount);
+    void placeOrder(OrderId oId, Quantity quantity, OrderType type, Side side, Price price) {
+        const int amount = quantity * price;
+
+        if (amount > this->getBalance()) {
+            return; //Throw error / fix later
+        }
+
+        Order order {oId, type, side, quantity, price};
+
+    }
     void cancelOrder(const std::vector<Order>& orders);
     void modifyOrder(const std::vector<Order>& orders);
 
@@ -113,6 +122,7 @@ private:
     std::string m_name;
     Balance m_balance {}; 
     std::vector<Order> m_orders {};
+
 };
 
 int main () {
