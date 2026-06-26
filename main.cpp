@@ -18,8 +18,8 @@ enum class Side {
 
 class Order {
 public:
-    Order(OrderId orderId, OrderType orderType, Side side, Quantity quantity, Price price) {
-        m_orderId = { orderId };
+    Order(OrderType orderType, Side side, Quantity quantity, Price price) {
+        m_orderId = { nextID++ };
         m_orderType = { orderType };
         m_side = { side };
         m_quantity = { quantity };
@@ -51,14 +51,17 @@ public:
     
 
 private:
-    OrderId  m_orderId; 
+    static OrderId nextID;
+    OrderId m_orderId; 
     OrderType m_orderType;
     Side m_side;
     Quantity m_quantity;
     Price m_price;
-    
 
 };
+
+OrderId Order::nextID {};
+
 
 class OrderBook {
 public:
@@ -86,8 +89,7 @@ private:
     std::priority_queue<Order> m_bids {}; //max-heap
     std::priority_queue<Order, std::vector<Order>, std::greater<Order>> m_asks {}; //min-heap 
     std::unordered_map<int, Order> orderMap ; //orderId to Order
-    
-
+       
 };
 
 
@@ -105,18 +107,25 @@ public:
     std::string getName() { return m_name; }; 
     Balance getBalance() { return m_balance; };
 
-    void placeOrder(OrderId oId, Quantity quantity, OrderType type, Side side, Price price) {
-        const int amount = quantity * price;
+    void placeOrder(Quantity quantity, OrderType type, Side side, Price price) {
+        const uint amount { quantity * price };
 
         if (amount > this->getBalance()) {
-            return; //Throw error / fix later
+            throw std::underflow_error("Amount Greater than Balance.");
         }
 
-        Order order {oId, type, side, quantity, price};
+        Order order {type, side, quantity, price};
+        m_orders.push_back(order);
+        this->m_balance -= amount;
+    }
+
+    void cancelOrder() {
+        
+    }
+
+    void modifyOrder() {
 
     }
-    void cancelOrder(const std::vector<Order>& orders);
-    void modifyOrder(const std::vector<Order>& orders);
 
 private:
     std::string m_name;
@@ -126,7 +135,13 @@ private:
 };
 
 int main () {
-    Order order(0, OrderType::LIMIT, Side::BUY, 10, 100);
+    Order order(OrderType::LIMIT, Side::BUY, 10, 100);
+    Order order2(OrderType::LIMIT, Side::BUY, 10, 100);
+    Order order3(OrderType::LIMIT, Side::BUY, 10, 100);
+
+    std::cout << "OrderID: " << order.getOrderId() << "\n";
+    std::cout << "OrderID: " << order2.getOrderId() << "\n";
+    std::cout << "OrderID: " << order3.getOrderId() << "\n";
 
     Client client("John", 50);
     
